@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App with Prediction Graph</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #weather {
+            margin-top: 50px;
+        }
+        #prediction-graph {
+            margin-top: 50px;
+            width: 100%;
+            height: 500px; /* Adjust height as needed */
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather App</h1>
+    <div id="weather">
+        <h2>Loading...</h2>
+    </div>
+    <h2>Soyabean</h1>
+
+            <!-- Include necessary scripts and stylesheets -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    text-align: center;
+                }
+                #prediction-graph {
+                    margin-top: 50px;
+                    width: 80%; /* Adjust width as needed */
+                }
+            </style>
+        </head>
+        <body>
+            <!-- Display the graph image here -->
+            <img id="prediction-graph" src="graph.png" alt="Prediction Graph">
+        
+            <script>
+                // Connect to the server using Socket.IO
+                const socket = io.connect('http://localhost:5000'); // Adjust the server address
+        
+                // Listen for updates from the server
+                socket.on('update_data', (data) => {
+                    // Update the content of the div with the received data
+                    document.getElementById('update-div').innerText = data.message;
+                });
+            </script>
+       
+    <!-- Add an iframe to embed the prediction graph -->
+    <iframe id="prediction-graph" src="check2.html" frameborder="0"></iframe>
+
+    <script>
+        // JavaScript code for fetching weather data and updating the weather div
+        // (Same as before)
+    </script>
+</body>
+</html>
+
