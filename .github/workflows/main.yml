@@ -1,0 +1,48 @@
+name: Run Flask App
+
+on:
+  push:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python environment
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install -r requirements.txt
+
+    - name: Install Jupyter Notebook dependencies (if needed for check2.ipynb)
+      run: |
+        python -m pip install jupyter
+
+    - name: Run Jupyter Notebook
+      run: |
+        jupyter nbconvert --execute --to notebook check2.ipynb
+
+    - name: Copy plot images to static folder
+      run: |
+        mkdir -p static
+        cp my_plot.png my_plot1.png static/
+
+    - name: Commit changes
+      run: |
+        git config --global user.email "github-actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add static/
+        git add check2.nbconvert.ipynb
+        git diff-index --quiet HEAD || git commit -m "Add plot images"
+        git push
+
+    - name: Run Flask application
+      run: |
+        python3 app.py &
+        sleep 20
