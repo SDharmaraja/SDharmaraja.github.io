@@ -1,0 +1,9 @@
+flask
+nbformat
+nbconvert
+pandas
+numpy
+tensorflow
+scikit-learn
+matplotlib
+bokeh
