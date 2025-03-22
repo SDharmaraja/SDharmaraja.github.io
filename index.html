@@ -388,7 +388,19 @@
 </section>
   </section>
 
-  
+  <section id="crop-prediction" class="home-section">
+    <div class="container">
+        <h2>Crop Yield Prediction</h2>
+        <form id="predictionForm">
+            <input type="number" id="temperature" placeholder="Temperature (°C)" required>
+            <input type="number" id="rainfall" placeholder="Rainfall (mm)" required>
+            <button type="submit">Predict Yield</button>
+        </form>
+        <div id="predictionResult"></div>
+        <div id="error-message" style="color: red;"></div>
+    </div>
+</section>
+
 
   <section id="contact" class="home-section wg-contact   "  >
     <div class="container">
