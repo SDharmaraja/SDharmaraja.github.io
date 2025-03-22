@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soybean Price Prediction</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding-top: 20px; }
+        .container { max-width: 600px; }
+        #predictionForm { margin-bottom: 20px; }
+        #predictionResult { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Soybean Price Prediction</h1>
+        <form id="predictionForm">
+            <div class="form-group">
+                <label for="historicalPrice">Last Historical Price:</label>
+                <input type="number" class="form-control" id="historicalPrice" placeholder="Enter last historical price" required>
+            </div>
+            <div class="form-group">
+                <label for="demand">Demand:</label>
+                <input type="number" class="form-control" id="demand" placeholder="Enter demand" required>
+            </div>
+            <div class="form-group">
+                <label for="supply">Supply:</label>
+                <input type="number" class="form-control" id="supply" placeholder="Enter supply" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Predict Price</button>
+        </form>
+        <div id="predictionResult"></div>
+        <div id="error-message" style="color: red;"></div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const historicalPrice = document.getElementById('historicalPrice').value;
+            const demand = document.getElementById('demand').value;
+            const supply = document.getElementById('supply').value;
+
+            if (!historicalPrice || !demand || !supply) {
+                document.getElementById('error-message').innerText = "Please fill in all fields.";
+                return;
+            }
+            document.getElementById('error-message').innerText = "";
+
+            try {
+                const response = await fetch('../predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ historicalPrice: historicalPrice, demand: demand, supply: supply })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.prediction !== undefined) {
+                    document.getElementById('predictionResult').innerText = `Predicted Price: ${data.prediction}`;
+                } else if (data.error) {
+                    document.getElementById('predictionResult').innerText = `Prediction failed: ${data.error}`;
+                } else {
+                    document.getElementById('predictionResult').innerText = "Prediction failed: Invalid data received.";
+                }
+
+            } catch (error) {
+                console.error('Error during prediction:', error);
+                document.getElementById('predictionResult').innerText = `Prediction failed: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
