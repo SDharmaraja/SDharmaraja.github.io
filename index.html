@@ -388,61 +388,7 @@
 </section>
   </section>
 
- <section id="crop-prediction" class="home-section">
-    <div class="container">
-        <h2>Crop Yield Prediction</h2>
-        <form id="predictionForm">
-            <input type="number" id="temperature" placeholder="Temperature (°C)" required>
-            <input type="number" id="rainfall" placeholder="Rainfall (mm)" required>
-            <button type="submit">Predict Yield</button>
-        </form>
-        <div id="predictionResult"></div>
-        <div id="error-message" style="color: red;"></div>
-    </div>
-</section>
 
-<script>
-    document.getElementById('predictionForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        const temperature = document.getElementById('temperature').value;
-        const rainfall = document.getElementById('rainfall').value;
-
-        if (!temperature || !rainfall) {
-            document.getElementById('error-message').innerText = "Please fill in all fields.";
-            return;
-        }
-        document.getElementById('error-message').innerText = "";
-
-        try {
-            const response = await fetch('YOUR_BACKEND_API_ENDPOINT', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ temperature: temperature, rainfall: rainfall })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            if (data.prediction !== undefined) {
-                document.getElementById('predictionResult').innerText = `Predicted Yield: ${data.prediction}`;
-            } else if (data.error) {
-                document.getElementById('predictionResult').innerText = `Prediction failed: ${data.error}`; // Display error from backend
-            } else {
-                document.getElementById('predictionResult').innerText = "Prediction failed: Invalid data received.";
-            }
-
-        } catch (error) {
-            console.error('Error during prediction:', error);
-            document.getElementById('predictionResult').innerText = `Prediction failed: ${error.message}`;
-        }
-    });
-</script>
 
 
   <section id="contact" class="home-section wg-contact   "  >
