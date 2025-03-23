@@ -245,14 +245,61 @@
           </div>
           <div class="button-container">
             <!-- <button class="view-predictions-btn" onclick="window.location.reload()">View Recent Predictions</button> -->
-          <section id="prediction">
-    <h2>Prediction</h2>
-    <!-- Old link removed -->
-    <!-- <a href="YOUR_APP_URL">Launch the prediction app</a> -->
-    <!-- New container for results: -->
-    <h3>Prediction Results</h3>
-    <div id="prediction-results">Loading predictions...</div>
+         <section id="prediction" class="home-section">
+    <div class="container">
+        <h2>Soybean Price Prediction</h2>
+        <form id="predictionForm">
+            <div class="form-group">
+                <label for="date">Select Date:</label>
+                <input type="date" class="form-control" id="date" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Predict Price</button>
+        </form>
+        <div id="predictionResult"></div>
+        <div id="error-message" style="color: red;"></div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const selectedDate = document.getElementById('date').value;
+
+            if (!selectedDate) {
+                document.getElementById('error-message').innerText = "Please select a date.";
+                return;
+            }
+            document.getElementById('error-message').innerText = "";
+
+            try {
+                const response = await fetch('https://your-flask-api-url/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date: selectedDate })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.prediction !== undefined) {
+                    document.getElementById('predictionResult').innerText = `Predicted Price for ${selectedDate}: ₹${data.prediction}`;
+                } else if (data.error) {
+                    document.getElementById('predictionResult').innerText = `Prediction failed: ${data.error}`;
+                } else {
+                    document.getElementById('predictionResult').innerText = "Prediction failed: Invalid data received.";
+                }
+
+            } catch (error) {
+                console.error('Error during prediction:', error);
+                document.getElementById('predictionResult').innerText = `Prediction failed: ${error.message}`;
+            }
+        });
+    </script>
 </section>
+
 
 
             <!-- <iframe src="https://prediction-app-sdharmaraja.streamlit.app/" frameborder="0" style="width: 100%; height: 100px;"></iframe> -->
