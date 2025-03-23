@@ -245,37 +245,55 @@
           </div>
           <div class="button-container">
             <!-- <button class="view-predictions-btn" onclick="window.location.reload()">View Recent Predictions</button> -->
-         <section id="prediction" class="home-section">
+        <section id="prediction" class="home-section">
     <div class="container">
-        <h2>Price Prediction</h2>
+        <h2>Price Prediction Graph</h2>
         <form id="predictionForm">
             <div class="form-group">
-                <label for="date">Select Date:</label>
-                <input type="date" class="form-control" id="date" required>
+                <label for="startDate">Start Date:</label>
+                <input type="date" class="form-control" id="startDate" required>
             </div>
-            <button type="submit" class="btn btn-primary">Predict Price</button>
+            <div class="form-group">
+                <label for="endDate">End Date:</label>
+                <input type="date" class="form-control" id="endDate" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Prediction Graph</button>
         </form>
-        <div id="predictionResult"></div>
-        <div id="error-message" style="color: red;"></div>
+        <div id="error-message" style="color: red; margin-top: 10px;"></div>
+        <div id="graphContainer" style="margin-top: 20px;">
+            <!-- Placeholder for the graph -->
+            <h4>Predicted Price Graph</h4>
+            <div id="predictionGraph"></div>
+        </div>
     </div>
+
+    <!-- Include Plotly.js for graph rendering -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <script>
         document.getElementById('predictionForm').addEventListener('submit', async (event) => {
             event.preventDefault();
 
-            const selectedDate = document.getElementById('date').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
 
-            if (!selectedDate) {
-                document.getElementById('error-message').innerText = "Please select a date.";
+            if (!startDate || !endDate) {
+                document.getElementById('error-message').innerText = "Please select both start and end dates.";
                 return;
             }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                document.getElementById('error-message').innerText = "Start date must be earlier than end date.";
+                return;
+            }
+
             document.getElementById('error-message').innerText = "";
 
             try {
                 const response = await fetch('https://your-flask-api-url/predict', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ date: selectedDate })
+                    body: JSON.stringify({ startDate, endDate })
                 });
 
                 if (!response.ok) {
@@ -284,21 +302,40 @@
 
                 const data = await response.json();
 
-                if (data.prediction !== undefined) {
-                    document.getElementById('predictionResult').innerText = `Predicted Price for ${selectedDate}: ₹${data.prediction}`;
+                if (data.predictedPrices && data.dates) {
+                    renderGraph(data.dates, data.predictedPrices);
                 } else if (data.error) {
-                    document.getElementById('predictionResult').innerText = `Prediction failed: ${data.error}`;
+                    document.getElementById('error-message').innerText = `Prediction failed: ${data.error}`;
                 } else {
-                    document.getElementById('predictionResult').innerText = "Prediction failed: Invalid data received.";
+                    document.getElementById('error-message').innerText = "Prediction failed: Invalid data received.";
                 }
-
             } catch (error) {
-                console.error('Error during prediction:', error);
-                document.getElementById('predictionResult').innerText = `Prediction failed: ${error.message}`;
+                console.error("Error during prediction:", error);
+                document.getElementById('error-message').innerText = `Prediction failed: ${error.message}`;
             }
         });
+
+        function renderGraph(dates, predictedPrices) {
+            const trace = {
+                x: dates,
+                y: predictedPrices,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Predicted Prices',
+                line: { color: 'blue' }
+            };
+
+            const layout = {
+                title: 'Price Prediction Over Selected Date Range',
+                xaxis: { title: 'Date' },
+                yaxis: { title: 'Price (Rs/Quintal)' }
+            };
+
+            Plotly.newPlot('predictionGraph', [trace], layout);
+        }
     </script>
 </section>
+
 
 
 
